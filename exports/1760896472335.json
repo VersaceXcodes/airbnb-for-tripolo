@@ -1,0 +1,15 @@
+{
+  "timestamp": 1760896472335,
+  "operation": {
+    "id": "backend:specifications:asyncapi"
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/backend/asyncapi.yaml",
+      "type": "text",
+      "size": 31462,
+      "dependencies": false
+    }
+  ]
+}

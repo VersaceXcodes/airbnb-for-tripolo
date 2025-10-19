@@ -1,0 +1,21 @@
+{
+  "timestamp": 1760896935671,
+  "operation": {
+    "id": "backend:tests:main"
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/backend/server.test.ts",
+      "type": "text",
+      "size": 24848,
+      "dependencies": false
+    },
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/backend/jest.config.ts",
+      "type": "text",
+      "size": 387,
+      "dependencies": false
+    }
+  ]
+}

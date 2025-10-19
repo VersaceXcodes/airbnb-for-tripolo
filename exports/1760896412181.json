@@ -1,0 +1,15 @@
+{
+  "timestamp": 1760896412181,
+  "operation": {
+    "id": "db:schemas:zod"
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/backend/schema.ts",
+      "type": "text",
+      "size": 18142,
+      "dependencies": false
+    }
+  ]
+}

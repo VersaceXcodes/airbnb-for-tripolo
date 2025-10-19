@@ -1,0 +1,1955 @@
+openapi: 3.0.0
+info:
+  title: TripoStay API
+  description: >
+    Peer-to-peer short-term accommodation marketplace API specifically for
+    Tripoli, Lebanon. Includes guest search and booking functionality, host
+    listing and management tools, messaging, reviews, and user profiles.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    userIdPathParam:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: usr_abc123xyz
+    propertyIdPathParam:
+      name: property_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: prop_def456uvw
+    bookingIdPathParam:
+      name: booking_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: booking_ghi789rst
+    threadIdPathParam:
+      name: thread_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: thr_jkl012mno
+    wishlistIdPathParam:
+      name: wishlist_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: wish_pqr345cde
+    compareListIdPathParam:
+      name: compare_list_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: comp_stu678fgh
+    messageIdPathParam:
+      name: message_id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: msg_vwx901ijk
+    limitQueryParam:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+        example: 20
+    offsetQueryParam:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+        example: 20
+    sortByQueryParam:
+      name: sort_by
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - user_id
+          - email
+          - username
+          - created_at
+          - updated_at
+          - property_id
+          - title
+          - daily_price
+        default: created_at
+        example: email
+    sortOrderQueryParam:
+      name: sort_order
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        default: desc
+        example: asc
+    locationQueryParam:
+      name: location
+      in: query
+      required: false
+      schema:
+        type: string
+        example: Greater Tripoli
+    checkInQueryParam:
+      name: check_in
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date
+        example: 2025-04-10
+    checkOutQueryParam:
+      name: check_out
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date
+        example: 2025-04-15
+    guestsQueryParam:
+      name: guests
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 2
+    priceMinQueryParam:
+      name: price_min
+      in: query
+      required: false
+      schema:
+        type: number
+        example: 50000
+    priceMaxQueryParam:
+      name: price_max
+      in: query
+      required: false
+      schema:
+        type: number
+        example: 200000
+    amenitiesQueryParam:
+      name: amenities
+      in: query
+      required: false
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+        example:
+          - wifi
+          - ac
+          - kitchen
+    ratingMinQueryParam:
+      name: rating_min
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 4
+    sortResultsByQueryParam:
+      name: sort_by
+      in: query
+      required: false
+      schema:
+        type: string
+        example: price_lowest
+    propertyTypeFilterParam:
+      name: property_type
+      in: query
+      required: false
+      schema:
+        type: string
+        example: shared_room
+    isActiveFilterParam:
+      name: is_active
+      in: query
+      required: false
+      schema:
+        type: boolean
+        example: true
+    statusFilterParam:
+      name: status
+      in: query
+      required: false
+      schema:
+        type: string
+        example: confirmed
+    minRatingFilterParam:
+      name: min_rating
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 5
+        example: 3
+    maxRatingFilterParam:
+      name: max_rating
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 5
+        example: 5
+security:
+  - bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      operationId: registerUser
+      summary: Register a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserInput"
+      responses:
+        "201":
+          description: Successful registration response with JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                  token:
+                    type: string
+                    description: JWT token used to authenticate subsequent requests
+                required:
+                  - user
+                  - token
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+  /auth/login:
+    post:
+      operationId: loginUser
+      summary: Log in with existing credentials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username_or_email:
+                  type: string
+                  example: johndoe@example.com
+                password:
+                  type: string
+                  example: password123
+              required:
+                - username_or_email
+                - password
+      responses:
+        "200":
+          description: Successful login response with JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+                  token:
+                    type: string
+                    description: JWT token used to authenticate subsequent requests
+                required:
+                  - user
+                  - token
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /users/profile:
+    get:
+      operationId: getCurrentUserProfile
+      summary: Get current user profile information
+      responses:
+        "200":
+          description: Current authenticated user profile data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+    patch:
+      operationId: updateCurrentUserProfile
+      summary: Update current user profile information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserInput"
+      responses:
+        "200":
+          description: Updated user profile data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /users/{user_id}:
+    get:
+      operationId: getUserPublicProfile
+      summary: Get public user profile details
+      parameters:
+        - $ref: "#/components/parameters/userIdPathParam"
+      responses:
+        "200":
+          description: Public user profile information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+  /properties/search:
+    get:
+      operationId: searchProperties
+      summary: Search properties based on query, filters and pagination
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+            example: villa beachfront tripoli
+        - $ref: "#/components/parameters/locationQueryParam"
+        - $ref: "#/components/parameters/checkInQueryParam"
+        - $ref: "#/components/parameters/checkOutQueryParam"
+        - $ref: "#/components/parameters/guestsQueryParam"
+        - $ref: "#/components/parameters/priceMinQueryParam"
+        - $ref: "#/components/parameters/priceMaxQueryParam"
+        - $ref: "#/components/parameters/propertyTypeFilterParam"
+        - $ref: "#/components/parameters/isActiveFilterParam"
+        - $ref: "#/components/parameters/minRatingFilterParam"
+        - $ref: "#/components/parameters/maxRatingFilterParam"
+        - $ref: "#/components/parameters/limitQueryParam"
+        - $ref: "#/components/parameters/offsetQueryParam"
+        - $ref: "#/components/parameters/sortByQueryParam"
+        - $ref: "#/components/parameters/sortOrderQueryParam"
+        - $ref: "#/components/parameters/sortResultsByQueryParam"
+      responses:
+        "200":
+          description: List of matching properties according to criteria
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  properties:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Property"
+                  total:
+                    type: integer
+                    example: 35
+                  offset:
+                    $ref: "#/components/parameters/offsetQueryParam/schema"
+                  limit:
+                    $ref: "#/components/parameters/limitQueryParam/schema"
+                required:
+                  - properties
+                  - total
+  /properties:
+    post:
+      operationId: createPropertyListing
+      summary: Create a new property listing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePropertyInput"
+      responses:
+        "201":
+          description: Successfully created property listing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /properties/{property_id}:
+    get:
+      operationId: getPropertyDetails
+      summary: Retrieve detailed property information including images and availability
+      parameters:
+        - $ref: "#/components/parameters/propertyIdPathParam"
+      responses:
+        "200":
+          description: Complete property information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+    patch:
+      operationId: updatePropertyDetails
+      summary: Update property listing information
+      parameters:
+        - $ref: "#/components/parameters/propertyIdPathParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePropertyInput"
+      responses:
+        "200":
+          description: Updated property details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Property"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+    delete:
+      operationId: deletePropertyListing
+      summary: Permanently remove a property listing
+      parameters:
+        - $ref: "#/components/parameters/propertyIdPathParam"
+      responses:
+        "204":
+          description: Property successfully deleted
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+  /properties/{property_id}/images:
+    post:
+      operationId: uploadPropertyMedia
+      summary: Upload images associated with a property
+      parameters:
+        - $ref: "#/components/parameters/propertyIdPathParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image_urls:
+                  type: array
+                  items:
+                    type: string
+                    format: uri
+                  minItems: 1
+                  maxItems: 10
+                is_primary:
+                  type: boolean
+                  default: false
+              required:
+                - image_urls
+      responses:
+        "201":
+          description: Images uploaded and linked with property
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PropertyImage"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    get:
+      operationId: getPropertyImages
+      summary: Get all images for a property
+      parameters:
+        - $ref: "#/components/parameters/propertyIdPathParam"
+      responses:
+        "200":
+          description: List of property images
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PropertyImage"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+    patch:
+      operationId: reorderPropertyImages
+      summary: Change display order of property images
+      parameters:
+        - $ref: "#/components/parameters/propertyIdPathParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image_order_pairs:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      image_id:
+                        type: string
+                      display_order:
+                        type: integer
+                    required:
+                      - image_id
+                      - display_order
+              required:
+                - image_order_pairs
+      responses:
+        "200":
+          description: Images re-ordered successfully
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    delete:
+      operationId: deletePropertyImage
+      summary: Delete an image from a property
+      parameters:
+        - $ref: "#/components/parameters/propertyIdPathParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image_ids:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - image_ids
+      responses:
+        "204":
+          description: Image removed
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /properties/{property_id}/availability:
+    get:
+      operationId: getPropertyAvailabilityDates
+      summary: Get dates when property is available/unavailable for booking
+      parameters:
+        - $ref: "#/components/parameters/propertyIdPathParam"
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Availability status for queried timeframe
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AvailabilityDate"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+    post:
+      operationId: setPropertyAvailabilityDates
+      summary: Set or toggle date availability for a property
+      parameters:
+        - $ref: "#/components/parameters/propertyIdPathParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dates:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      date:
+                        type: string
+                        format: date
+                      is_available:
+                        type: boolean
+                    required:
+                      - date
+                      - is_available
+              required:
+                - dates
+      responses:
+        "201":
+          description: Dates successfully set to appropriate availability values
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AvailabilityDate"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /bookings:
+    post:
+      operationId: createNewBooking
+      summary: Initiate a new booking or send booking request depending on listing
+        configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                property_id:
+                  type: string
+                check_in_date:
+                  type: string
+                  format: date
+                check_out_date:
+                  type: string
+                  format: date
+                guests_count:
+                  type: integer
+                  minimum: 1
+                total_amount:
+                  type: number
+              required:
+                - property_id
+                - check_in_date
+                - check_out_date
+                - guests_count
+                - total_amount
+      responses:
+        "201":
+          description: New booking initiated or requested
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  booking:
+                    $ref: "#/components/schemas/Booking"
+                  message_thread:
+                    $ref: "#/components/schemas/MessageThread"
+                    nullable: true
+                required:
+                  - booking
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /bookings/search:
+    get:
+      operationId: searchBookings
+      summary: Search bookings made by a guest or associated with a host's listings
+      parameters:
+        - name: property_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: guest_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: host_id
+          in: query
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/statusFilterParam"
+        - name: start_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - $ref: "#/components/parameters/limitQueryParam"
+        - $ref: "#/components/parameters/offsetQueryParam"
+      responses:
+        "200":
+          description: Matching bookings retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bookings:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Booking"
+                  total:
+                    type: integer
+                    example: 5
+                  offset:
+                    type: integer
+                  limit:
+                    type: integer
+                required:
+                  - bookings
+                  - total
+  /bookings/{booking_id}:
+    get:
+      operationId: getBookingDetails
+      summary: Retrieve specific booking information, including related data like
+        property, payments, etc.
+      parameters:
+        - $ref: "#/components/parameters/bookingIdPathParam"
+      responses:
+        "200":
+          description: Booking details fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+    patch:
+      operationId: updateBookingInfo
+      summary: Modify booking details such as status or dates
+      parameters:
+        - $ref: "#/components/parameters/bookingIdPathParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBookingInput"
+      responses:
+        "200":
+          description: Booking updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /bookings/{booking_id}/cancel:
+    post:
+      operationId: cancelBookingById
+      summary: Initiate cancellation process for a booking
+      parameters:
+        - $ref: "#/components/parameters/bookingIdPathParam"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 500
+      responses:
+        "200":
+          description: Booking marked as cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+  /reviews:
+    post:
+      operationId: submitNewReview
+      summary: Submit a review for a completed stay
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewInput"
+      responses:
+        "201":
+          description: Review added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /reviews/search:
+    get:
+      operationId: searchReviews
+      summary: Retrieve reviews for given property
+      parameters:
+        - name: property_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - $ref: "#/components/parameters/limitQueryParam"
+        - $ref: "#/components/parameters/offsetQueryParam"
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum:
+              - review_id
+              - rating
+              - created_at
+              - updated_at
+        - $ref: "#/components/parameters/sortOrderQueryParam"
+      responses:
+        "200":
+          description: List of reviews matching query
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reviews:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Review"
+                required:
+                  - reviews
+  /reviews/{review_id}/flag:
+    post:
+      operationId: flagReviewAsAbusive
+      summary: Mark review as abusive for administrative review
+      parameters:
+        - name: review_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  maxLength: 500
+              additionalProperties: false
+      responses:
+        "200":
+          description: Review flagged for moderation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+  /messages/threads:
+    get:
+      operationId: getUserActiveThreads
+      summary: Fetch messaging threads for current user as either guest or host
+      parameters:
+        - $ref: "#/components/parameters/limitQueryParam"
+        - $ref: "#/components/parameters/offsetQueryParam"
+      responses:
+        "200":
+          description: Active user threads retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  threads:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/MessageThread"
+                  total:
+                    type: integer
+                required:
+                  - threads
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      operationId: initiateNewMessagingThread
+      summary: Create initial message to start discussing interest in a property or
+        resolve issue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMessageThreadInput"
+      responses:
+        "201":
+          description: New thread established between participants
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageThread"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /messages/threads/{thread_id}:
+    get:
+      operationId: getMessagesFromThread
+      summary: Load all messages within a thread conversation history
+      parameters:
+        - $ref: "#/components/parameters/threadIdPathParam"
+        - $ref: "#/components/parameters/limitQueryParam"
+        - $ref: "#/components/parameters/offsetQueryParam"
+      responses:
+        "200":
+          description: All messages loaded within thread scope
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Message"
+                required:
+                  - messages
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+    patch:
+      operationId: markThreadMessagesRead
+      summary: Mark all incoming messages in thread as read
+      parameters:
+        - $ref: "#/components/parameters/threadIdPathParam"
+      responses:
+        "200":
+          description: All unread messages processed
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+  /messages:
+    post:
+      operationId: sendMessageInThread
+      summary: Send new message inside established conversation thread
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                thread_id:
+                  type: string
+                content:
+                  type: string
+                  minLength: 1
+                  maxLength: 5000
+              required:
+                - thread_id
+                - content
+      responses:
+        "201":
+          description: Message delivered to recipient
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /user/wishlist:
+    get:
+      operationId: getCurrentUserWishlists
+      summary: Get all property favorited by authenticated user
+      parameters:
+        - $ref: "#/components/parameters/limitQueryParam"
+        - $ref: "#/components/parameters/offsetQueryParam"
+      responses:
+        "200":
+          description: User's favorite listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Wishlist"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      operationId: addToUserWishlist
+      summary: Save property to authenticated user’s favorites
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                property_id:
+                  type: string
+              required:
+                - property_id
+      responses:
+        "201":
+          description: Favorite added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Wishlist"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+    delete:
+      operationId: removeFromUserWishlistByPropertyId
+      summary: Remove property from authenticated user’s favorites
+      parameters:
+        - name: property_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Removed from favorites
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+  /compare_lists:
+    get:
+      operationId: getListingsInCurrentUserCompareList
+      summary: Get properties included in current user's comparison list
+      parameters:
+        - $ref: "#/components/parameters/limitQueryParam"
+        - $ref: "#/components/parameters/offsetQueryParam"
+      responses:
+        "200":
+          description: Properties selected for comparison
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CompareList"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      operationId: addToListingsCompareList
+      summary: Add selected property for comparative consideration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                property_id:
+                  type: string
+              required:
+                - property_id
+      responses:
+        "201":
+          description: Property added to comparison group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCompareListInput"
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+    delete:
+      operationId: removeListingFromCompareByPropertyId
+      summary: Remove property from comparison cart/group view
+      parameters:
+        - name: property_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Comparison removed
+        "400":
+          $ref: "#/components/responses/BadRequestError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          $ref: "#/components/responses/NotFoundError"
+responses:
+  BadRequestError:
+    description: Invalid input provided
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Malformed JSON body
+          required:
+            - error
+  UnauthorizedError:
+    description: Authentication token missing or invalid
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Invalid JWT signature
+          required:
+            - error
+  ForbiddenError:
+    description: Insufficient permissions to perform action
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Must own listing to modify
+          required:
+            - error
+  NotFoundError:
+    description: Resource does not exist
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: No record found matching ID 'prop_xyz'
+          required:
+            - error
+  ConflictError:
+    description: Action violates uniqueness constraint or causes conflict
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Email address already in use
+          required:
+            - error
+schemas:
+  User:
+    type: object
+    properties:
+      user_id:
+        type: string
+      email:
+        type: string
+        format: email
+      username:
+        type: string
+      password_hash:
+        type: string
+      full_name:
+        type: string
+        nullable: true
+      phone_number:
+        type: string
+        nullable: true
+      bio:
+        type: string
+        nullable: true
+      profile_image_url:
+        type: string
+        nullable: true
+      language_preference:
+        type: string
+        nullable: true
+      is_host:
+        type: boolean
+      is_verified:
+        type: boolean
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+    required:
+      - user_id
+      - email
+      - username
+      - password_hash
+      - is_host
+      - is_verified
+      - created_at
+      - updated_at
+  CreateUserInput:
+    type: object
+    properties:
+      user_id:
+        type: string
+        maxLength: 255
+        minLength: 1
+      email:
+        type: string
+        format: email
+        maxLength: 255
+        minLength: 1
+      username:
+        type: string
+        maxLength: 255
+        minLength: 1
+      password_hash:
+        type: string
+        minLength: 1
+        maxLength: 255
+      full_name:
+        type: string
+        nullable: true
+        maxLength: 255
+      phone_number:
+        type: string
+        nullable: true
+        maxLength: 20
+      bio:
+        type: string
+        nullable: true
+        maxLength: 1000
+      profile_image_url:
+        type: string
+        nullable: true
+        format: uri
+      language_preference:
+        type: string
+        nullable: true
+        maxLength: 10
+      is_host:
+        type: boolean
+      is_verified:
+        type: boolean
+    required:
+      - user_id
+      - email
+      - username
+      - password_hash
+  UpdateUserInput:
+    type: object
+    properties:
+      user_id:
+        type: string
+      email:
+        type: string
+        format: email
+      username:
+        type: string
+        minLength: 1
+        maxLength: 255
+      password_hash:
+        type: string
+        minLength: 1
+        maxLength: 255
+      full_name:
+        type: string
+        nullable: true
+        maxLength: 255
+      phone_number:
+        type: string
+        nullable: true
+        maxLength: 20
+      bio:
+        type: string
+        nullable: true
+        maxLength: 1000
+      profile_image_url:
+        type: string
+        nullable: true
+        format: uri
+      language_preference:
+        type: string
+        nullable: true
+        maxLength: 10
+      is_host:
+        type: boolean
+      is_verified:
+        type: boolean
+    required:
+      - user_id
+  Property:
+    type: object
+    properties:
+      property_id:
+        type: string
+      host_id:
+        type: string
+      title:
+        type: string
+      description:
+        type: string
+        nullable: true
+      property_type:
+        type: string
+      daily_price:
+        type: number
+      address:
+        type: string
+        nullable: true
+      latitude:
+        type: number
+        nullable: true
+      longitude:
+        type: number
+        nullable: true
+      check_in_instructions:
+        type: string
+        nullable: true
+      amenities:
+        type: string
+        nullable: true
+      is_instant_book:
+        type: boolean
+      cancellation_policy:
+        type: string
+        nullable: true
+      is_active:
+        type: boolean
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+    required:
+      - property_id
+      - host_id
+      - title
+      - property_type
+      - daily_price
+      - is_instant_book
+      - is_active
+      - created_at
+      - updated_at
+  CreatePropertyInput:
+    type: object
+    properties:
+      property_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      host_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      title:
+        type: string
+        minLength: 1
+        maxLength: 255
+      description:
+        type: string
+        nullable: true
+        maxLength: 5000
+      property_type:
+        type: string
+        minLength: 1
+        maxLength: 100
+      daily_price:
+        type: number
+        minimum: 0
+      address:
+        type: string
+        nullable: true
+        maxLength: 500
+      latitude:
+        type: number
+        nullable: true
+      longitude:
+        type: number
+        nullable: true
+      check_in_instructions:
+        type: string
+        nullable: true
+        maxLength: 1000
+      amenities:
+        type: string
+        nullable: true
+        maxLength: 1000
+      is_instant_book:
+        type: boolean
+      cancellation_policy:
+        type: string
+        nullable: true
+        maxLength: 100
+      is_active:
+        type: boolean
+    required:
+      - property_id
+      - host_id
+      - title
+      - property_type
+      - daily_price
+  UpdatePropertyInput:
+    type: object
+    properties:
+      property_id:
+        type: string
+      host_id:
+        type: string
+      title:
+        type: string
+        minLength: 1
+        maxLength: 255
+      description:
+        type: string
+        nullable: true
+        maxLength: 5000
+      property_type:
+        type: string
+        minLength: 1
+        maxLength: 100
+      daily_price:
+        type: number
+        minimum: 0
+      address:
+        type: string
+        nullable: true
+        maxLength: 500
+      latitude:
+        type: number
+        nullable: true
+      longitude:
+        type: number
+        nullable: true
+      check_in_instructions:
+        type: string
+        nullable: true
+        maxLength: 1000
+      amenities:
+        type: string
+        nullable: true
+        maxLength: 1000
+      is_instant_book:
+        type: boolean
+      cancellation_policy:
+        type: string
+        nullable: true
+        maxLength: 100
+      is_active:
+        type: boolean
+    required:
+      - property_id
+  PropertyImage:
+    type: object
+    properties:
+      image_id:
+        type: string
+      property_id:
+        type: string
+      image_url:
+        type: string
+        format: uri
+      is_primary:
+        type: boolean
+      display_order:
+        type: integer
+      created_at:
+        type: string
+        format: date-time
+    required:
+      - image_id
+      - property_id
+      - image_url
+      - is_primary
+      - display_order
+      - created_at
+  CreatePropertyImageInput:
+    type: object
+    properties:
+      image_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      property_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      image_url:
+        type: string
+        format: uri
+        minLength: 1
+        maxLength: 500
+      is_primary:
+        type: boolean
+      display_order:
+        type: integer
+        minimum: 0
+    required:
+      - image_id
+      - property_id
+      - image_url
+  UpdatePropertyImageInput:
+    type: object
+    properties:
+      image_id:
+        type: string
+      property_id:
+        type: string
+      image_url:
+        type: string
+        format: uri
+        minLength: 1
+        maxLength: 500
+      is_primary:
+        type: boolean
+      display_order:
+        type: integer
+        minimum: 0
+    required:
+      - image_id
+  AvailabilityDate:
+    type: object
+    properties:
+      availability_id:
+        type: string
+      property_id:
+        type: string
+      date:
+        type: string
+        format: date
+      is_available:
+        type: boolean
+      created_at:
+        type: string
+        format: date-time
+    required:
+      - availability_id
+      - property_id
+      - date
+      - is_available
+      - created_at
+  CreateAvailabilityDateInput:
+    type: object
+    properties:
+      availability_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      property_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      date:
+        type: string
+        format: date
+      is_available:
+        type: boolean
+    required:
+      - availability_id
+      - property_id
+      - date
+  Booking:
+    type: object
+    properties:
+      booking_id:
+        type: string
+      property_id:
+        type: string
+      guest_id:
+        type: string
+      check_in_date:
+        type: string
+        format: date
+      check_out_date:
+        type: string
+        format: date
+      guests_count:
+        type: integer
+      total_amount:
+        type: number
+      status:
+        type: string
+      cancellation_reason:
+        type: string
+        nullable: true
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+    required:
+      - booking_id
+      - property_id
+      - guest_id
+      - check_in_date
+      - check_out_date
+      - guests_count
+      - total_amount
+      - status
+      - created_at
+      - updated_at
+  CreateBookingInput:
+    type: object
+    properties:
+      booking_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      property_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      guest_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      check_in_date:
+        type: string
+        format: date
+      check_out_date:
+        type: string
+        format: date
+      guests_count:
+        type: integer
+        minimum: 1
+      total_amount:
+        type: number
+        minimum: 0
+      status:
+        type: string
+        minLength: 1
+        maxLength: 50
+      cancellation_reason:
+        type: string
+        nullable: true
+        maxLength: 500
+    required:
+      - booking_id
+      - property_id
+      - guest_id
+      - check_in_date
+      - check_out_date
+      - guests_count
+      - total_amount
+      - status
+  UpdateBookingInput:
+    type: object
+    properties:
+      booking_id:
+        type: string
+      property_id:
+        type: string
+      guest_id:
+        type: string
+      check_in_date:
+        type: string
+        format: date
+      check_out_date:
+        type: string
+        format: date
+      guests_count:
+        type: integer
+        minimum: 1
+      total_amount:
+        type: number
+        minimum: 0
+      status:
+        type: string
+        minLength: 1
+        maxLength: 50
+      cancellation_reason:
+        type: string
+        nullable: true
+        maxLength: 500
+    required:
+      - booking_id
+  Review:
+    type: object
+    properties:
+      review_id:
+        type: string
+      property_id:
+        type: string
+      booking_id:
+        type: string
+      reviewer_id:
+        type: string
+      rating:
+        type: integer
+        minimum: 1
+        maximum: 5
+      comment:
+        type: string
+        nullable: true
+      is_anonymous:
+        type: boolean
+      is_flagged:
+        type: boolean
+      created_at:
+        type: string
+        format: date-time
+      updated_at:
+        type: string
+        format: date-time
+    required:
+      - review_id
+      - property_id
+      - booking_id
+      - reviewer_id
+      - rating
+      - is_anonymous
+      - is_flagged
+      - created_at
+      - updated_at
+  CreateReviewInput:
+    type: object
+    properties:
+      review_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      property_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      booking_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      reviewer_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      rating:
+        type: integer
+        minimum: 1
+        maximum: 5
+      comment:
+        type: string
+        nullable: true
+        maxLength: 2000
+      is_anonymous:
+        type: boolean
+      is_flagged:
+        type: boolean
+    required:
+      - review_id
+      - property_id
+      - booking_id
+      - reviewer_id
+      - rating
+  Message:
+    type: object
+    properties:
+      message_id:
+        type: string
+      thread_id:
+        type: string
+      sender_id:
+        type: string
+      recipient_id:
+        type: string
+      content:
+        type: string
+      is_read:
+        type: boolean
+      created_at:
+        type: string
+        format: date-time
+    required:
+      - message_id
+      - thread_id
+      - sender_id
+      - recipient_id
+      - content
+      - is_read
+      - created_at
+  CreateMessageInput:
+    type: object
+    properties:
+      message_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      thread_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      sender_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      recipient_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      content:
+        type: string
+        minLength: 1
+        maxLength: 5000
+      is_read:
+        type: boolean
+    required:
+      - message_id
+      - thread_id
+      - sender_id
+      - recipient_id
+      - content
+  MessageThread:
+    type: object
+    properties:
+      thread_id:
+        type: string
+      property_id:
+        type: string
+        nullable: true
+      guest_id:
+        type: string
+      host_id:
+        type: string
+      last_message_at:
+        type: string
+        format: date-time
+        nullable: true
+      created_at:
+        type: string
+        format: date-time
+    required:
+      - thread_id
+      - guest_id
+      - host_id
+      - created_at
+  CreateMessageThreadInput:
+    type: object
+    properties:
+      thread_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      property_id:
+        type: string
+        nullable: true
+        maxLength: 255
+      guest_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      host_id:
+        type: string
+        minLength: 1
+        maxLength: 255
+      last_message_at:
+        type: string
+        format: date-time
+        nullable: true
+    required:
+      - thread_id
+      - guest_id
+      - host_id
+  Wishlist:
+    type: object
+    properties:
+      wishlist_id:
+        type: string
+      user_id:
+        type: string
+      property_id:
+        type: string
+      added_at:
+        type: string
+        format: date-time
+    required:
+      - wishlist_id
+      - user_id
+      - property_id
+      - added_at
+  CompareList:
+    type: object
+    properties:
+      compare_list_id:
+        type: string
+      user_id:
+        type: string
+      property_id:
+        type: string
+      added_at:
+        type: string
+        format: date-time
+    required:
+      - compare_list_id
+      - user_id
+      - property_id
+      - added_at

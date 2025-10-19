@@ -1,0 +1,19 @@
+{
+  "timestamp": 1760896975952,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_Footer",
+      "version": "latest"
+    }
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/vitereact/src/components/views/GV_Footer.tsx",
+      "type": "text",
+      "size": 1621,
+      "dependencies": false
+    }
+  ]
+}

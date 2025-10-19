@@ -1,0 +1,19 @@
+{
+  "timestamp": 1760897042080,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_BookingConfirmation",
+      "version": "1760896996092"
+    }
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/vitereact/src/components/views/UV_BookingConfirmation.tsx",
+      "type": "text",
+      "size": 14476,
+      "dependencies": false
+    }
+  ]
+}

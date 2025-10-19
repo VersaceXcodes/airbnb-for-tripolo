@@ -1,0 +1,19 @@
+{
+  "timestamp": 1760897000567,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_TopNav",
+      "version": "latest"
+    }
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/vitereact/src/components/views/GV_TopNav.tsx",
+      "type": "text",
+      "size": 14369,
+      "dependencies": false
+    }
+  ]
+}

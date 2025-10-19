@@ -1,0 +1,15 @@
+{
+  "timestamp": 1760896518004,
+  "operation": {
+    "id": "backend:specifications:openapi"
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/backend/openapi.yaml",
+      "type": "text",
+      "size": 50410,
+      "dependencies": false
+    }
+  ]
+}

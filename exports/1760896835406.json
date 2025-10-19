@@ -1,0 +1,15 @@
+{
+  "timestamp": 1760896835406,
+  "operation": {
+    "id": "backend:server:main"
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/backend/server.ts",
+      "type": "text",
+      "size": 66870,
+      "dependencies": false
+    }
+  ]
+}

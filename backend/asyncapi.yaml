@@ -1,0 +1,1268 @@
+asyncapi: 2.0.0
+info:
+  title: TripoStay Realtime Events API
+  version: 1.0.0
+  description: Realtime events for TripoStay - Airbnb for Tripoli
+servers:
+  dev:
+    url: http://localhost:3000
+    protocol: ws
+channels:
+  /users:
+    subscribe:
+      operationId: userUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/UserCreatedEvent"
+          - $ref: "#/components/messages/UserUpdatedEvent"
+          - $ref: "#/components/messages/UserDeletedEvent"
+    publish:
+      operationId: userActions
+      message:
+        oneOf:
+          - $ref: "#/components/messages/CreateUserCommand"
+          - $ref: "#/components/messages/UpdateUserCommand"
+          - $ref: "#/components/messages/DeleteUserCommand"
+  /properties:
+    subscribe:
+      operationId: propertyUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/PropertyCreatedEvent"
+          - $ref: "#/components/messages/PropertyUpdatedEvent"
+          - $ref: "#/components/messages/PropertyDeletedEvent"
+    publish:
+      operationId: propertyActions
+      message:
+        oneOf:
+          - $ref: "#/components/messages/CreatePropertyCommand"
+          - $ref: "#/components/messages/UpdatePropertyCommand"
+          - $ref: "#/components/messages/DeletePropertyCommand"
+  /properties/search:
+    subscribe:
+      operationId: propertySearchResults
+      message:
+        $ref: "#/components/messages/PropertySearchResultsEvent"
+    publish:
+      operationId: propertySearchQuery
+      message:
+        $ref: "#/components/messages/SearchPropertyCommand"
+  /property-images:
+    subscribe:
+      operationId: propertyImageUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/PropertyImageAddedEvent"
+          - $ref: "#/components/messages/PropertyImageUpdatedEvent"
+          - $ref: "#/components/messages/PropertyImageRemovedEvent"
+    publish:
+      operationId: propertyImageActions
+      message:
+        oneOf:
+          - $ref: "#/components/messages/AddPropertyImageCommand"
+          - $ref: "#/components/messages/UpdatePropertyImageCommand"
+          - $ref: "#/components/messages/RemovePropertyImageCommand"
+  /availability-dates:
+    subscribe:
+      operationId: availabilityUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/AvailabilityDateAddedEvent"
+          - $ref: "#/components/messages/AvailabilityDateUpdatedEvent"
+          - $ref: "#/components/messages/AvailabilityDateRemovedEvent"
+    publish:
+      operationId: availabilityActions
+      message:
+        oneOf:
+          - $ref: "#/components/messages/AddAvailabilityDateCommand"
+          - $ref: "#/components/messages/UpdateAvailabilityDateCommand"
+          - $ref: "#/components/messages/RemoveAvailabilityDateCommand"
+  /bookings:
+    subscribe:
+      operationId: bookingUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/BookingCreatedEvent"
+          - $ref: "#/components/messages/BookingUpdatedEvent"
+          - $ref: "#/components/messages/BookingCancelledEvent"
+    publish:
+      operationId: bookingActions
+      message:
+        oneOf:
+          - $ref: "#/components/messages/CreateBookingCommand"
+          - $ref: "#/components/messages/UpdateBookingCommand"
+          - $ref: "#/components/messages/CancelBookingCommand"
+  /reviews:
+    subscribe:
+      operationId: reviewUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/ReviewCreatedEvent"
+          - $ref: "#/components/messages/ReviewUpdatedEvent"
+          - $ref: "#/components/messages/ReviewDeletedEvent"
+    publish:
+      operationId: reviewActions
+      message:
+        oneOf:
+          - $ref: "#/components/messages/CreateReviewCommand"
+          - $ref: "#/components/messages/UpdateReviewCommand"
+          - $ref: "#/components/messages/DeleteReviewCommand"
+  /messages:
+    subscribe:
+      operationId: messageUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/MessageSentEvent"
+          - $ref: "#/components/messages/MessageReadEvent"
+    publish:
+      operationId: messageActions
+      message:
+        oneOf:
+          - $ref: "#/components/messages/SendMessageCommand"
+          - $ref: "#/components/messages/MarkMessageAsReadCommand"
+  /message-threads:
+    subscribe:
+      operationId: threadUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/ThreadCreatedEvent"
+          - $ref: "#/components/messages/ThreadUpdatedEvent"
+    publish:
+      operationId: threadActions
+      message:
+        oneOf:
+          - $ref: "#/components/messages/CreateThreadCommand"
+          - $ref: "#/components/messages/UpdateThreadCommand"
+  /wishlists:
+    subscribe:
+      operationId: wishlistUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/WishlistItemAddedEvent"
+          - $ref: "#/components/messages/WishlistItemRemovedEvent"
+    publish:
+      operationId: wishlistActions
+      message:
+        oneOf:
+          - $ref: "#/components/messages/AddToWishlistCommand"
+          - $ref: "#/components/messages/RemoveFromWishlistCommand"
+  /compare-lists:
+    subscribe:
+      operationId: compareListUpdates
+      message:
+        oneOf:
+          - $ref: "#/components/messages/CompareListItemAddedEvent"
+          - $ref: "#/components/messages/CompareListItemRemovedEvent"
+    publish:
+      operationId: compareListActions
+      message:
+        oneOf:
+          - $ref: "#/components/messages/AddToCompareListCommand"
+          - $ref: "#/components/messages/RemoveFromCompareListCommand"
+components:
+  messages:
+    UserCreatedEvent:
+      payload:
+        $ref: "#/components/schemas/UserPayload"
+      name: user.created
+    UserUpdatedEvent:
+      payload:
+        $ref: "#/components/schemas/UserPayload"
+      name: user.updated
+    UserDeletedEvent:
+      payload:
+        type: object
+        properties:
+          user_id:
+            type: string
+        required:
+          - user_id
+      name: user.deleted
+    CreateUserCommand:
+      payload:
+        $ref: "#/components/schemas/CreateUserInputPayload"
+      name: user.create
+    UpdateUserCommand:
+      payload:
+        $ref: "#/components/schemas/UpdateUserInputPayload"
+      name: user.update
+    DeleteUserCommand:
+      payload:
+        type: object
+        properties:
+          user_id:
+            type: string
+        required:
+          - user_id
+      name: user.delete
+    PropertyCreatedEvent:
+      payload:
+        $ref: "#/components/schemas/PropertyPayload"
+      name: property.created
+    PropertyUpdatedEvent:
+      payload:
+        $ref: "#/components/schemas/PropertyPayload"
+      name: property.updated
+    PropertyDeletedEvent:
+      payload:
+        type: object
+        properties:
+          property_id:
+            type: string
+        required:
+          - property_id
+      name: property.deleted
+    CreatePropertyCommand:
+      payload:
+        $ref: "#/components/schemas/CreatePropertyInputPayload"
+      name: property.create
+    UpdatePropertyCommand:
+      payload:
+        $ref: "#/components/schemas/UpdatePropertyInputPayload"
+      name: property.update
+    DeletePropertyCommand:
+      payload:
+        type: object
+        properties:
+          property_id:
+            type: string
+        required:
+          - property_id
+      name: property.delete
+    PropertySearchResultsEvent:
+      payload:
+        type: object
+        properties:
+          results:
+            type: array
+            items:
+              $ref: "#/components/schemas/PropertyPayload"
+          total_count:
+            type: integer
+          limit:
+            type: integer
+          offset:
+            type: integer
+        required:
+          - results
+          - total_count
+          - limit
+          - offset
+      name: property.search.results
+    SearchPropertyCommand:
+      payload:
+        $ref: "#/components/schemas/SearchPropertyInputPayload"
+      name: property.search
+    PropertyImageAddedEvent:
+      payload:
+        $ref: "#/components/schemas/PropertyImagePayload"
+      name: property.image.added
+    PropertyImageUpdatedEvent:
+      payload:
+        $ref: "#/components/schemas/PropertyImagePayload"
+      name: property.image.updated
+    PropertyImageRemovedEvent:
+      payload:
+        type: object
+        properties:
+          image_id:
+            type: string
+        required:
+          - image_id
+      name: property.image.removed
+    AddPropertyImageCommand:
+      payload:
+        $ref: "#/components/schemas/CreatePropertyImageInputPayload"
+      name: property.image.add
+    UpdatePropertyImageCommand:
+      payload:
+        $ref: "#/components/schemas/UpdatePropertyImageInputPayload"
+      name: property.image.update
+    RemovePropertyImageCommand:
+      payload:
+        type: object
+        properties:
+          image_id:
+            type: string
+        required:
+          - image_id
+      name: property.image.remove
+    AvailabilityDateAddedEvent:
+      payload:
+        $ref: "#/components/schemas/AvailabilityDatePayload"
+      name: availability.date.added
+    AvailabilityDateUpdatedEvent:
+      payload:
+        $ref: "#/components/schemas/AvailabilityDatePayload"
+      name: availability.date.updated
+    AvailabilityDateRemovedEvent:
+      payload:
+        type: object
+        properties:
+          availability_id:
+            type: string
+        required:
+          - availability_id
+      name: availability.date.removed
+    AddAvailabilityDateCommand:
+      payload:
+        $ref: "#/components/schemas/CreateAvailabilityDateInputPayload"
+      name: availability.date.add
+    UpdateAvailabilityDateCommand:
+      payload:
+        $ref: "#/components/schemas/UpdateAvailabilityDateInputPayload"
+      name: availability.date.update
+    RemoveAvailabilityDateCommand:
+      payload:
+        type: object
+        properties:
+          availability_id:
+            type: string
+        required:
+          - availability_id
+      name: availability.date.remove
+    BookingCreatedEvent:
+      payload:
+        $ref: "#/components/schemas/BookingPayload"
+      name: booking.created
+    BookingUpdatedEvent:
+      payload:
+        $ref: "#/components/schemas/BookingPayload"
+      name: booking.updated
+    BookingCancelledEvent:
+      payload:
+        type: object
+        properties:
+          booking_id:
+            type: string
+          status:
+            type: string
+          cancellation_reason:
+            type: string
+            nullable: true
+        required:
+          - booking_id
+          - status
+      name: booking.cancelled
+    CreateBookingCommand:
+      payload:
+        $ref: "#/components/schemas/CreateBookingInputPayload"
+      name: booking.create
+    UpdateBookingCommand:
+      payload:
+        $ref: "#/components/schemas/UpdateBookingInputPayload"
+      name: booking.update
+    CancelBookingCommand:
+      payload:
+        type: object
+        properties:
+          booking_id:
+            type: string
+          cancellation_reason:
+            type: string
+            nullable: true
+        required:
+          - booking_id
+      name: booking.cancel
+    ReviewCreatedEvent:
+      payload:
+        $ref: "#/components/schemas/ReviewPayload"
+      name: review.created
+    ReviewUpdatedEvent:
+      payload:
+        $ref: "#/components/schemas/ReviewPayload"
+      name: review.updated
+    ReviewDeletedEvent:
+      payload:
+        type: object
+        properties:
+          review_id:
+            type: string
+        required:
+          - review_id
+      name: review.deleted
+    CreateReviewCommand:
+      payload:
+        $ref: "#/components/schemas/CreateReviewInputPayload"
+      name: review.create
+    UpdateReviewCommand:
+      payload:
+        $ref: "#/components/schemas/UpdateReviewInputPayload"
+      name: review.update
+    DeleteReviewCommand:
+      payload:
+        type: object
+        properties:
+          review_id:
+            type: string
+        required:
+          - review_id
+      name: review.delete
+    MessageSentEvent:
+      payload:
+        $ref: "#/components/schemas/MessagePayload"
+      name: message.sent
+    MessageReadEvent:
+      payload:
+        type: object
+        properties:
+          message_id:
+            type: string
+          is_read:
+            type: boolean
+        required:
+          - message_id
+          - is_read
+      name: message.read
+    SendMessageCommand:
+      payload:
+        $ref: "#/components/schemas/CreateMessageInputPayload"
+      name: message.send
+    MarkMessageAsReadCommand:
+      payload:
+        type: object
+        properties:
+          message_id:
+            type: string
+          is_read:
+            type: boolean
+        required:
+          - message_id
+          - is_read
+      name: message.mark.read
+    ThreadCreatedEvent:
+      payload:
+        $ref: "#/components/schemas/MessageThreadPayload"
+      name: thread.created
+    ThreadUpdatedEvent:
+      payload:
+        $ref: "#/components/schemas/MessageThreadPayload"
+      name: thread.updated
+    CreateThreadCommand:
+      payload:
+        $ref: "#/components/schemas/CreateMessageThreadInputPayload"
+      name: thread.create
+    UpdateThreadCommand:
+      payload:
+        $ref: "#/components/schemas/UpdateMessageThreadInputPayload"
+      name: thread.update
+    WishlistItemAddedEvent:
+      payload:
+        $ref: "#/components/schemas/WishlistPayload"
+      name: wishlist.item.added
+    WishlistItemRemovedEvent:
+      payload:
+        type: object
+        properties:
+          wishlist_id:
+            type: string
+        required:
+          - wishlist_id
+      name: wishlist.item.removed
+    AddToWishlistCommand:
+      payload:
+        $ref: "#/components/schemas/CreateWishlistInputPayload"
+      name: wishlist.add
+    RemoveFromWishlistCommand:
+      payload:
+        type: object
+        properties:
+          wishlist_id:
+            type: string
+        required:
+          - wishlist_id
+      name: wishlist.remove
+    CompareListItemAddedEvent:
+      payload:
+        $ref: "#/components/schemas/CompareListPayload"
+      name: compare.list.item.added
+    CompareListItemRemovedEvent:
+      payload:
+        type: object
+        properties:
+          compare_list_id:
+            type: string
+        required:
+          - compare_list_id
+      name: compare.list.item.removed
+    AddToCompareListCommand:
+      payload:
+        $ref: "#/components/schemas/CreateCompareListInputPayload"
+      name: compare.list.add
+    RemoveFromCompareListCommand:
+      payload:
+        type: object
+        properties:
+          compare_list_id:
+            type: string
+        required:
+          - compare_list_id
+      name: compare.list.remove
+  schemas:
+    UserPayload:
+      type: object
+      properties:
+        user_id:
+          type: string
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        password_hash:
+          type: string
+        full_name:
+          type: string
+          nullable: true
+        phone_number:
+          type: string
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+        profile_image_url:
+          type: string
+          nullable: true
+        language_preference:
+          type: string
+          nullable: true
+        is_host:
+          type: boolean
+        is_verified:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - user_id
+        - email
+        - username
+        - password_hash
+        - is_host
+        - is_verified
+        - created_at
+        - updated_at
+    CreateUserInputPayload:
+      type: object
+      properties:
+        user_id:
+          type: string
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        password_hash:
+          type: string
+        full_name:
+          type: string
+          nullable: true
+        phone_number:
+          type: string
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+        profile_image_url:
+          type: string
+          nullable: true
+        language_preference:
+          type: string
+          nullable: true
+        is_host:
+          type: boolean
+        is_verified:
+          type: boolean
+      required:
+        - user_id
+        - email
+        - username
+        - password_hash
+    UpdateUserInputPayload:
+      type: object
+      properties:
+        user_id:
+          type: string
+        email:
+          type: string
+          format: email
+        username:
+          type: string
+        password_hash:
+          type: string
+        full_name:
+          type: string
+          nullable: true
+        phone_number:
+          type: string
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+        profile_image_url:
+          type: string
+          nullable: true
+        language_preference:
+          type: string
+          nullable: true
+        is_host:
+          type: boolean
+        is_verified:
+          type: boolean
+      required:
+        - user_id
+    PropertyPayload:
+      type: object
+      properties:
+        property_id:
+          type: string
+        host_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        property_type:
+          type: string
+        daily_price:
+          type: number
+        address:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        check_in_instructions:
+          type: string
+          nullable: true
+        amenities:
+          type: string
+          nullable: true
+        is_instant_book:
+          type: boolean
+        cancellation_policy:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - property_id
+        - host_id
+        - title
+        - property_type
+        - daily_price
+        - is_instant_book
+        - is_active
+        - created_at
+        - updated_at
+    CreatePropertyInputPayload:
+      type: object
+      properties:
+        property_id:
+          type: string
+        host_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        property_type:
+          type: string
+        daily_price:
+          type: number
+        address:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        check_in_instructions:
+          type: string
+          nullable: true
+        amenities:
+          type: string
+          nullable: true
+        is_instant_book:
+          type: boolean
+        cancellation_policy:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+      required:
+        - property_id
+        - host_id
+        - title
+        - property_type
+        - daily_price
+    UpdatePropertyInputPayload:
+      type: object
+      properties:
+        property_id:
+          type: string
+        host_id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        property_type:
+          type: string
+        daily_price:
+          type: number
+        address:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        check_in_instructions:
+          type: string
+          nullable: true
+        amenities:
+          type: string
+          nullable: true
+        is_instant_book:
+          type: boolean
+        cancellation_policy:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+      required:
+        - property_id
+    SearchPropertyInputPayload:
+      type: object
+      properties:
+        query:
+          type: string
+          nullable: true
+        host_id:
+          type: string
+          nullable: true
+        property_type:
+          type: string
+          nullable: true
+        min_price:
+          type: number
+          nullable: true
+        max_price:
+          type: number
+          nullable: true
+        is_active:
+          type: boolean
+          nullable: true
+        limit:
+          type: integer
+        offset:
+          type: integer
+        sort_by:
+          type: string
+          enum:
+            - property_id
+            - title
+            - daily_price
+            - created_at
+            - updated_at
+        sort_order:
+          type: string
+          enum:
+            - asc
+            - desc
+      required:
+        - limit
+        - offset
+        - sort_by
+        - sort_order
+    PropertyImagePayload:
+      type: object
+      properties:
+        image_id:
+          type: string
+        property_id:
+          type: string
+        image_url:
+          type: string
+        is_primary:
+          type: boolean
+        display_order:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - image_id
+        - property_id
+        - image_url
+        - is_primary
+        - display_order
+        - created_at
+    CreatePropertyImageInputPayload:
+      type: object
+      properties:
+        image_id:
+          type: string
+        property_id:
+          type: string
+        image_url:
+          type: string
+        is_primary:
+          type: boolean
+        display_order:
+          type: integer
+      required:
+        - image_id
+        - property_id
+        - image_url
+    UpdatePropertyImageInputPayload:
+      type: object
+      properties:
+        image_id:
+          type: string
+        property_id:
+          type: string
+        image_url:
+          type: string
+        is_primary:
+          type: boolean
+        display_order:
+          type: integer
+      required:
+        - image_id
+    AvailabilityDatePayload:
+      type: object
+      properties:
+        availability_id:
+          type: string
+        property_id:
+          type: string
+        date:
+          type: string
+          format: date-time
+        is_available:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - availability_id
+        - property_id
+        - date
+        - is_available
+        - created_at
+    CreateAvailabilityDateInputPayload:
+      type: object
+      properties:
+        availability_id:
+          type: string
+        property_id:
+          type: string
+        date:
+          type: string
+          format: date-time
+        is_available:
+          type: boolean
+      required:
+        - availability_id
+        - property_id
+        - date
+    UpdateAvailabilityDateInputPayload:
+      type: object
+      properties:
+        availability_id:
+          type: string
+        property_id:
+          type: string
+        date:
+          type: string
+          format: date-time
+        is_available:
+          type: boolean
+      required:
+        - availability_id
+    BookingPayload:
+      type: object
+      properties:
+        booking_id:
+          type: string
+        property_id:
+          type: string
+        guest_id:
+          type: string
+        check_in_date:
+          type: string
+          format: date-time
+        check_out_date:
+          type: string
+          format: date-time
+        guests_count:
+          type: integer
+        total_amount:
+          type: number
+        status:
+          type: string
+        cancellation_reason:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - booking_id
+        - property_id
+        - guest_id
+        - check_in_date
+        - check_out_date
+        - guests_count
+        - total_amount
+        - status
+        - created_at
+        - updated_at
+    CreateBookingInputPayload:
+      type: object
+      properties:
+        booking_id:
+          type: string
+        property_id:
+          type: string
+        guest_id:
+          type: string
+        check_in_date:
+          type: string
+          format: date-time
+        check_out_date:
+          type: string
+          format: date-time
+        guests_count:
+          type: integer
+        total_amount:
+          type: number
+        status:
+          type: string
+        cancellation_reason:
+          type: string
+          nullable: true
+      required:
+        - booking_id
+        - property_id
+        - guest_id
+        - check_in_date
+        - check_out_date
+        - guests_count
+        - total_amount
+        - status
+    UpdateBookingInputPayload:
+      type: object
+      properties:
+        booking_id:
+          type: string
+        property_id:
+          type: string
+        guest_id:
+          type: string
+        check_in_date:
+          type: string
+          format: date-time
+        check_out_date:
+          type: string
+          format: date-time
+        guests_count:
+          type: integer
+        total_amount:
+          type: number
+        status:
+          type: string
+        cancellation_reason:
+          type: string
+          nullable: true
+      required:
+        - booking_id
+    ReviewPayload:
+      type: object
+      properties:
+        review_id:
+          type: string
+        property_id:
+          type: string
+        booking_id:
+          type: string
+        reviewer_id:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+        is_anonymous:
+          type: boolean
+        is_flagged:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - review_id
+        - property_id
+        - booking_id
+        - reviewer_id
+        - rating
+        - is_anonymous
+        - is_flagged
+        - created_at
+        - updated_at
+    CreateReviewInputPayload:
+      type: object
+      properties:
+        review_id:
+          type: string
+        property_id:
+          type: string
+        booking_id:
+          type: string
+        reviewer_id:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+        is_anonymous:
+          type: boolean
+        is_flagged:
+          type: boolean
+      required:
+        - review_id
+        - property_id
+        - booking_id
+        - reviewer_id
+        - rating
+    UpdateReviewInputPayload:
+      type: object
+      properties:
+        review_id:
+          type: string
+        property_id:
+          type: string
+        booking_id:
+          type: string
+        reviewer_id:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+        is_anonymous:
+          type: boolean
+        is_flagged:
+          type: boolean
+      required:
+        - review_id
+    MessagePayload:
+      type: object
+      properties:
+        message_id:
+          type: string
+        thread_id:
+          type: string
+        sender_id:
+          type: string
+        recipient_id:
+          type: string
+        content:
+          type: string
+        is_read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - message_id
+        - thread_id
+        - sender_id
+        - recipient_id
+        - content
+        - is_read
+        - created_at
+    CreateMessageInputPayload:
+      type: object
+      properties:
+        message_id:
+          type: string
+        thread_id:
+          type: string
+        sender_id:
+          type: string
+        recipient_id:
+          type: string
+        content:
+          type: string
+        is_read:
+          type: boolean
+      required:
+        - message_id
+        - thread_id
+        - sender_id
+        - recipient_id
+        - content
+    MessageThreadPayload:
+      type: object
+      properties:
+        thread_id:
+          type: string
+        property_id:
+          type: string
+          nullable: true
+        guest_id:
+          type: string
+        host_id:
+          type: string
+        last_message_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+        - thread_id
+        - guest_id
+        - host_id
+        - created_at
+    CreateMessageThreadInputPayload:
+      type: object
+      properties:
+        thread_id:
+          type: string
+        property_id:
+          type: string
+          nullable: true
+        guest_id:
+          type: string
+        host_id:
+          type: string
+        last_message_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - thread_id
+        - guest_id
+        - host_id
+    UpdateMessageThreadInputPayload:
+      type: object
+      properties:
+        thread_id:
+          type: string
+        property_id:
+          type: string
+          nullable: true
+        guest_id:
+          type: string
+        host_id:
+          type: string
+        last_message_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - thread_id
+    WishlistPayload:
+      type: object
+      properties:
+        wishlist_id:
+          type: string
+        user_id:
+          type: string
+        property_id:
+          type: string
+        added_at:
+          type: string
+          format: date-time
+      required:
+        - wishlist_id
+        - user_id
+        - property_id
+        - added_at
+    CreateWishlistInputPayload:
+      type: object
+      properties:
+        wishlist_id:
+          type: string
+        user_id:
+          type: string
+        property_id:
+          type: string
+        added_at:
+          type: string
+          format: date-time
+      required:
+        - wishlist_id
+        - user_id
+        - property_id
+    CompareListPayload:
+      type: object
+      properties:
+        compare_list_id:
+          type: string
+        user_id:
+          type: string
+        property_id:
+          type: string
+        added_at:
+          type: string
+          format: date-time
+      required:
+        - compare_list_id
+        - user_id
+        - property_id
+        - added_at
+    CreateCompareListInputPayload:
+      type: object
+      properties:
+        compare_list_id:
+          type: string
+        user_id:
+          type: string
+        property_id:
+          type: string
+        added_at:
+          type: string
+          format: date-time
+      required:
+        - compare_list_id
+        - user_id
+        - property_id

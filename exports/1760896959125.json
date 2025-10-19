@@ -1,0 +1,19 @@
+{
+  "timestamp": 1760896959125,
+  "operation": {
+    "id": "webapp:react:root",
+    "refs": {
+      "id": "app",
+      "version": "1760896938589"
+    }
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/vitereact/src/App.tsx",
+      "type": "text",
+      "size": 9103,
+      "dependencies": false
+    }
+  ]
+}

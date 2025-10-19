@@ -1,0 +1,15 @@
+{
+  "timestamp": 1760896869848,
+  "operation": {
+    "id": "settings:config:package"
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/backend/.env",
+      "type": "text",
+      "size": 406,
+      "dependencies": false
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "timestamp": 1760897074192,
+  "operation": {
+    "id": "settings:config:package"
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/vitereact/package.json",
+      "type": "text",
+      "size": 2990,
+      "dependencies": true
+    }
+  ]
+}

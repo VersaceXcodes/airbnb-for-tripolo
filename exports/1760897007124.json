@@ -1,0 +1,19 @@
+{
+  "timestamp": 1760897007124,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_PaymentRetry",
+      "version": "latest"
+    }
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/vitereact/src/components/views/UV_PaymentRetry.tsx",
+      "type": "text",
+      "size": 8731,
+      "dependencies": false
+    }
+  ]
+}

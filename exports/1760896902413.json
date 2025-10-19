@@ -1,0 +1,19 @@
+{
+  "timestamp": 1760896902413,
+  "operation": {
+    "id": "webapp:react:store",
+    "refs": {
+      "id": "redux",
+      "version": "1760896871257"
+    }
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/vitereact/src/store/main.tsx",
+      "type": "text",
+      "size": 13998,
+      "dependencies": false
+    }
+  ]
+}

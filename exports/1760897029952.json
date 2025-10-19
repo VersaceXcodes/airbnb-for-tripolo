@@ -1,0 +1,19 @@
+{
+  "timestamp": 1760897029952,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_Dashboard_Host",
+      "version": "latest"
+    }
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/vitereact/src/components/views/UV_Dashboard_Host.tsx",
+      "type": "text",
+      "size": 18598,
+      "dependencies": false
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "timestamp": 1760896344049,
+  "operation": {
+    "id": "db:postgres"
+  },
+  "projectId": "airbnb-for-tripolo",
+  "files": [
+    {
+      "path": "/mnt/data/airbnb-for-tripolo/backend/db.sql",
+      "type": "text",
+      "size": 13748,
+      "dependencies": false
+    }
+  ]
+}
